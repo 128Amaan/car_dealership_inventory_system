@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { WindowSticker } from '../components/WindowSticker';
+import { CollectorPoster } from '../components/CollectorPoster';
 import { Modal } from '../components/Modal';
 import { VehicleForm } from '../components/VehicleForm';
 
@@ -108,7 +108,7 @@ export default function Dashboard() {
         </div>
         <div className="mt-4 grid grid-cols-12 gap-6 items-end">
           <h1 className="col-span-12 lg:col-span-8 font-din font-black text-ink uppercase leading-[0.85] text-[clamp(3rem,8vw,8rem)] tracking-tight">
-            Floor&nbsp;Spec&nbsp;Sheets
+            Heritage&nbsp;Collection
           </h1>
           <div className="col-span-12 lg:col-span-4 grid grid-cols-2 gap-x-5 gap-y-2">
             <StatRow label="listings"       value={stats.total} />
@@ -133,7 +133,7 @@ export default function Dashboard() {
           <SearchField label="max $"    type="number" value={filters.max} onChange={v => setFilters(f => ({...f, max:v}))} />
           <div className="col-span-12 lg:col-span-2 flex gap-2 justify-end">
             <button className="btn-wire" onClick={() => setFilters(EMPTY_SEARCH)}>Clear</button>
-            {isAdmin && <button className="btn-ink" onClick={() => setCreating(true)}>+ New sticker</button>}
+            {isAdmin && <button className="btn-ink" onClick={() => setCreating(true)}>+ Print poster</button>}
           </div>
         </div>
       </section>
@@ -143,18 +143,18 @@ export default function Dashboard() {
         {err && <div className="my-4 border-2 border-signal px-4 py-3 text-signal font-mono text-sm">{err}</div>}
 
         {loading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {Array.from({length: 4}).map((_, i) => <div key={i} className="sticker h-80 animate-pulse" />)}
+          <div className="grid grid-cols-1 gap-10">
+            {Array.from({length: 2}).map((_, i) => <div key={i} className="poster h-[800px] animate-pulse" />)}
           </div>
         ) : vehicles.length === 0 ? (
           <div className="py-20 text-center plate p-10">
             <div className="font-din font-black text-ink text-5xl uppercase">No matches on floor.</div>
-            <div className="punch text-mute mt-3">clear the filters, or print a new sticker.</div>
+            <div className="punch text-mute mt-3">clear the filters, or print a new poster.</div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-14">
             {vehicles.map((v, i) => (
-              <WindowSticker
+              <CollectorPoster
                 key={v.id}
                 vehicle={v}
                 index={i}
@@ -170,7 +170,7 @@ export default function Dashboard() {
         )}
 
         <div className="mt-10 border-t-2 border-ink pt-4 flex justify-between punch text-mute">
-          <span>end of issue 24 · {vehicles.length}&nbsp;stickers printed</span>
+          <span>end of issue 24 · {vehicles.length}&nbsp;posters printed</span>
           <span>Baldwin &amp; Co. · plate 0012-NY</span>
         </div>
       </section>

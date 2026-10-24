@@ -6,14 +6,17 @@ delete and restock inventory. Backend is FastAPI + SQLite with JWT auth;
 frontend is React + TypeScript + Tailwind. Backend logic is **test-driven**
 with a visible **Red → Green → Refactor** commit history.
 
-![Floor spec sheets](docs/screenshots/dashboard.jpg)
+![Heritage Collection masthead](docs/screenshots/dashboard.jpg)
 
-*Each vehicle is a literal **Monroney-style window sticker** — bone-paper placard with lot plates, VIN stamp, EPA yellow fuel-economy block, dense Haynes-manual spec table, patent-drawing side elevation of the car, and the asking price in a red-bordered box.*
+*Each vehicle is a **magazine-grade collector poster** — chevron warning band, B&Co shield mark, HERITAGE SERIES line with document code & lot number, condensed-DIN headline the size of a billboard, handwritten tagline accent in cursive, and a dense left side-rail of metadata (VIN, collector edition 004/500, exterior color swatch, production plant, QR build-sheet).*
 
-![Sticker detail](docs/screenshots/sticker-detail.jpg)
-![Sold out stamp](docs/screenshots/sold-out.jpg)
+![Side elevation + 3-view](docs/screenshots/poster-elevation.jpg)
+![Engine schematic + factory options](docs/screenshots/poster-engine.jpg)
+![Signatures + barcode](docs/screenshots/poster-signatures.jpg)
 
-*Left: full window sticker detail — spec table in dotted hairline grid, EPA fuel panel, Form MR-1 footer. Right: the single bold moment — out-of-stock lots are literally rubber-stamped "SOLD OUT" in signal red across the price corner.*
+*Top: hero SVG side elevation with dimension callouts (OVERALL LENGTH / WHEELBASE / HEIGHT) + the FRONT/SIDE/REAR 3-view strip + performance tiles.*
+*Middle: in-poster engine schematic (3.6L V6 — SCHEMATIC) with cylinders, intake manifold, oil pan, belt pulley; factory options checklist with filled/unfilled dots.*
+*Bottom: signature block (REGISTERED BY / DESIGN ARCHIVE / APPROVED BY / DATE — handwritten in cursive like a workshop manual sign-off), barcode with stock number, BUILT TO LAST stamp, action buttons, chevron closing band.*
 
 ---
 
@@ -25,7 +28,7 @@ with a visible **Red → Green → Refactor** commit history.
 | Database    | **SQLite** (default) / Postgres via `DATABASE_URL` | Fits the spec; swap env var for Postgres   |
 | Auth        | **JWT** (`python-jose`) + `pbkdf2_sha256`  | No native bcrypt deps — ships on Vercel serverless   |
 | Frontend    | **React 18 (JSX) + Vite + Tailwind**        | Per spec: HTML5 + CSS3 + Tailwind + React, no TS    |
-| Fonts       | **Barlow Condensed** (DIN-style display) + **Barlow** (body) + **JetBrains Mono** (data) | One family + a mono, no Inter / Roboto / system defaults |
+| Fonts       | **Barlow Condensed** (DIN display) + **Barlow** (body) + **JetBrains Mono** (data) + **Caveat** (handwritten signatures) | Three functional roles + a script, no Inter / Roboto / system defaults |
 | Tests       | **pytest** + **httpx TestClient**           | Fast, isolated per-test SQLite                       |
 | Deployment  | **Vercel** (static frontend + Python API)   | Single-repo, zero-config                             |
 
@@ -210,27 +213,36 @@ car_dealership_inventory_system/
 
 ---
 
-## Design direction — the "Window Sticker"
+## Design direction — the "Heritage Collector Poster"
 
 Explicit anti-SaaS. The subject matter is a dealer floor; the design language
-is **the physical paperwork of a dealer floor** — Monroney window stickers,
-Haynes workshop manuals, Porsche press-kit spec tables, patent drawings.
-The brief was pivoted twice before landing here:
+is **the physical paperwork of car heritage** — Monroney window stickers,
+Haynes workshop manuals, Porsche/BMW press-kit spec tables, patent drawings,
+and vintage collector-magazine covers for Chevrolet C10 / Ford Mustang Shelby
+/ Jaguar XK120 / Toyota AE86. The brief was pivoted four times before landing:
 
-1. v1: dark dashboard + orange accent (scrapped — hits every AI-generated tell).
-2. v2: bone-paper *manifest* with Fraunces italics (scrapped — too editorial, not technical enough for an inventory system).
-3. **v3 (current): the Monroney window sticker.** Each vehicle is a credible printed placard — lot plates, VIN stamp, EPA fuel-economy yellow block, patent-drawing elevation, dense spec table. The data IS the design.
+1. **v1**: dark dashboard + orange accent (scrapped — hits every AI-generated tell).
+2. **v2**: bone-paper *manifest* with Fraunces italics (scrapped — too editorial).
+3. **v3**: window sticker with EPA yellow block + mini spec table (close, but thin).
+4. **v4 (current): the Heritage Collector Poster.** Each vehicle is a full
+   magazine-cover-sized spec sheet with chevron warning bands, condensed-DIN
+   headline, dense 3-column body (metadata rail / hero elevation + 3-view /
+   performance tiles), bottom panel of 5 framed insets (perf data / factory
+   options / engine schematic / tire-and-wheel / chassis diagram), and a
+   footer with handwritten signatures, barcode and BUILT TO LAST stamp.
 
 | Decision                      | Why                                                           |
 | ----------------------------- | ------------------------------------------------------------- |
-| **Bone paper #EFECE3**        | Dealer stickers are printed on off-white stock, not dark glass. |
-| **Barlow Condensed + Barlow + JetBrains Mono** | DIN-style grotesque for display headlines (BMW-press-kit vibe), humanist sans for body, mono for every number. One family + a mono. No Inter, no system defaults. |
-| **No cards. Window stickers.** | Each listing is a bordered 2-column placard with a hard offset shadow (3px, no blur) — printed-document look. |
-| **Two accents, each used once per sticker** | Signal red #D21919 bordering the price; EPA yellow #F3D421 as the fuel-economy block. No other color anywhere. |
+| **Aged cream paper #E6DCC2**  | Layered SVG grain + vignette; collector-poster stock, not screen glass. |
+| **Barlow Condensed + Barlow + JetBrains Mono + Caveat** | DIN display for headlines, humanist sans for body, mono for every data cell, cursive for the signature block (REGISTERED BY / APPROVED BY). |
+| **One-sticker-per-row at desktop** | Posters are tall; cramming two in a row kills the magazine-cover feel. |
+| **Two accent colors, each used once** | Signal brick-red #B22222 bordering the asking price box only; workshop blue #1F3A5F for the handwritten signatures only. No other color anywhere. |
 | **Rubber-stamped SOLD OUT**   | Rotated red bar across the price corner; animates on mount. The one bold moment. |
-| **Patent-drawing CarDiagram** | Hairline-stroked side elevation of a generic car, with "FIG. 1 — SIDE ELEVATION" and a REF. A dimension line. Workshop-manual code. |
-| **Dotted-hairline spec table** | Haynes-manual grid: dim label on the left, right-aligned mono value on the right, dotted rule between. |
-| **Deterministic faux-specs**   | Each listing shows invented but stable VIN, mileage, MPG, engine, trans, drive, color, seating — derived from `id` so they stay consistent per vehicle. The backend doesn't store these; the UI makes the paper document complete. |
+| **SVG car 3-view**            | Front, side, rear orthographic views with dimension callouts (OVERALL LENGTH / WHEELBASE / HEIGHT / WIDTH / TRACK). No raster image dependency. |
+| **In-poster engine + wheel + chassis diagrams** | Pure SVG mechanical schematics (3.6L V6 schematic, 5-spoke P245/45R17 wheel, RWD ladder-frame chassis). |
+| **Barcode + handwritten signatures** | Legitimizes the document as a dealer record; signatures use Caveat in the single blueprint-blue. |
+| **Chevron warning bands**     | Top and bottom of each poster. Printed-sticker tell. |
+| **Deterministic faux-specs**  | Each poster shows invented but stable VIN, bore×stroke, compression, firing order, 0–60, ¼-mile — derived from `id` so they stay consistent per vehicle. The backend doesn't store these; the UI makes the collector document complete. |
 
 ## My AI Usage
 

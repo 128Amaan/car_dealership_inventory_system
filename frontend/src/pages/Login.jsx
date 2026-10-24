@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api, explainError } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { CarDiagram } from '../components/CarDiagram';
+import { CarSideHero } from '../components/CarViews';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -77,7 +77,7 @@ export function AuthShell({ formNo, pretitle, title, subtitle, children }) {
 
         <div className="mt-10 border-t-2 border-ink pt-4 max-w-md">
           <div className="punch text-mute mb-2">fig. 1 — showroom reference drawing</div>
-          <CarDiagram className="w-full h-auto text-ink" />
+          <CarSideHero className="w-full h-auto text-ink" />
         </div>
       </aside>
 
