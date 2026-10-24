@@ -2,39 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ──────────────────────────────────────────────────────────────── */
+/* Design tokens                                                     */
+:root {
+  --paper:  #F2EDE1;
+  --ink:    #0E0E0C;
+  --rust:   #B33F1A;
+  --moss:   #3F4A3A;
+  --signal: #E6C01A;
+  --hair:   #C8BFAD;
+  --mute:   #6B6659;
+}
+
 @layer base {
   html, body, #root { height: 100%; }
+
   body {
-    background:
-      radial-gradient(1200px 600px at 85% -10%, rgba(255,90,31,0.15), transparent 60%),
-      radial-gradient(900px 500px at -10% 110%, rgba(80,120,255,0.12), transparent 60%),
-      #07090d;
+    background-color: var(--paper);
+    /* Grain overlay — paper fiber. SVG feTurbulence, 1 pass. */
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0.08 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
     background-attachment: fixed;
   }
-  h1, h2, h3 { font-family: 'Space Grotesk', system-ui, sans-serif; letter-spacing: -0.01em; }
+
+  /* Numerals: tabular EVERYWHERE */
+  * { font-variant-numeric: tabular-nums; }
+
+  /* Selection — rust ink on paper */
+  ::selection { background: var(--rust); color: var(--paper); }
+
+  /* Custom scrollbar — hairline on paper, no track */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--ink); border: 3px solid var(--paper); border-radius: 0; }
+
+  /* Keyboard focus — stamped square outline */
+  :focus-visible {
+    outline: 2px solid var(--rust);
+    outline-offset: 3px;
+  }
+  button:focus-visible, a:focus-visible { outline-offset: 4px; }
+
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 500; }
 }
 
 @layer components {
-  .btn        { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition active:scale-[.98] disabled:opacity-40 disabled:cursor-not-allowed; }
-  .btn-accent { @apply btn bg-accent text-ink-950 hover:shadow-glow hover:brightness-110; }
-  .btn-ghost  { @apply btn bg-ink-800/60 text-chrome ring-1 ring-ink-600 hover:bg-ink-700; }
-  .btn-danger { @apply btn bg-red-500/20 text-red-200 ring-1 ring-red-500/40 hover:bg-red-500/30; }
+  /* ── Form controls ─────────────────────────────────────────── */
+  .input {
+    @apply w-full bg-transparent border-0 border-b border-ink/80
+           px-0 py-2.5 text-ink placeholder:text-mute
+           font-mono text-sm outline-none transition
+           focus:border-rust focus:border-b-2;
+  }
+  .label {
+    @apply mb-1 block text-[10px] font-mono tracking-punch text-mute;
+  }
 
-  .input      { @apply w-full rounded-xl bg-ink-800/70 ring-1 ring-ink-600 px-4 py-2.5 text-sm text-chrome placeholder:text-chrome/40 outline-none focus:ring-accent/60 focus:ring-2 transition; }
-  .label      { @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-chrome/60; }
+  /* ── Buttons ───────────────────────────────────────────────── */
+  /* Base: no border-radius, uppercase mono, physical hover */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2.5 text-[11px] font-mono font-bold
+           tracking-punch uppercase cursor-pointer transition-all
+           disabled:cursor-not-allowed disabled:opacity-30
+           active:translate-y-[1px];
+    border-radius: 0;
+  }
+  /* Primary = ink block, rust on hover */
+  .btn-ink {
+    @apply btn bg-ink text-paper
+           hover:bg-rust;
+  }
+  /* Secondary = hairline frame */
+  .btn-wire {
+    @apply btn bg-transparent text-ink border border-ink
+           hover:bg-ink hover:text-paper;
+  }
+  /* Danger = double-struck */
+  .btn-danger {
+    @apply btn bg-transparent text-rust border border-rust
+           hover:bg-rust hover:text-paper;
+  }
 
-  .card       { @apply rounded-2xl bg-ink-900/70 backdrop-blur-xl ring-1 ring-white/5 shadow-card; }
-  .chip       { @apply inline-flex items-center rounded-full bg-ink-800 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-chrome/70 ring-1 ring-ink-600; }
+  /* ── Document plates ───────────────────────────────────────── */
+  /* The "window-sticker" container: hard black border, no shadow */
+  .plate {
+    @apply bg-paper border border-ink;
+    border-radius: 0;
+  }
+  /* The hairline rule that draws in on page load */
+  .rule {
+    @apply h-px bg-ink origin-left animate-rule;
+  }
+  .rule-hair {
+    @apply h-px bg-hair;
+  }
 
-  .grid-bg {
-    background-image:
-      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size: 42px 42px;
+  /* ── Micro-labels ──────────────────────────────────────────── */
+  /* The small punched-letter header used above section titles.
+     Deliberately NOT reused as a sprinkle — used only on true
+     document section boundaries. */
+  .punch {
+    @apply text-[10px] font-mono tracking-punch text-ink;
+  }
+
+  /* ── Odometer-style number ─────────────────────────────────── */
+  .odo {
+    @apply font-mono tabular-nums text-ink;
+    letter-spacing: -0.02em;
   }
 }
 
-/* scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: #1b2432; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #2a3344; }
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

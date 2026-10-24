@@ -1,4 +1,4 @@
-# Velocity Motors — Car Dealership Inventory System
+# Baldwin & Co. — Car Dealership Inventory System
 
 A full-stack **Car Dealership Inventory System** built as a TDD kata. Users
 browse the showroom, filter cars, and purchase stock; admins add, edit,
@@ -6,7 +6,9 @@ delete and restock inventory. Backend is FastAPI + SQLite with JWT auth;
 frontend is React + TypeScript + Tailwind. Backend logic is **test-driven**
 with a visible **Red → Green → Refactor** commit history.
 
-![Dashboard](docs/screenshots/dashboard.jpg)
+![Manifest](docs/screenshots/dashboard.jpg)
+
+*The dashboard isn't a product grid — it's a **dealer's floor manifest**: a hairline-ruled ledger in Fraunces + JetBrains Mono, bone-paper background, one single rust accent, "SOLD OUT" literally rubber-stamped on out-of-stock lots.*
 
 ---
 
@@ -18,6 +20,7 @@ with a visible **Red → Green → Refactor** commit history.
 | Database    | **SQLite** (default) / Postgres via `DATABASE_URL` | Fits the spec; swap env var for Postgres   |
 | Auth        | **JWT** (`python-jose`) + `pbkdf2_sha256`  | No native bcrypt deps — ships on Vercel serverless   |
 | Frontend    | **React 18 (JSX) + Vite + Tailwind**        | Per spec: HTML5 + CSS3 + Tailwind + React, no TS    |
+| Fonts       | **Fraunces** (display) + **JetBrains Mono** (data) | Two families, no Inter / Roboto / system defaults |
 | Tests       | **pytest** + **httpx TestClient**           | Fast, isolated per-test SQLite                       |
 | Deployment  | **Vercel** (static frontend + Python API)   | Single-repo, zero-config                             |
 
@@ -38,7 +41,14 @@ with a visible **Red → Green → Refactor** commit history.
 - Restock (positive integer only — server rejects 0/negatives).
 - Delete vehicle (admin-only, 403 for buyers).
 
-![Edit modal](docs/screenshots/edit-modal.jpg)
+| | |
+|---|---|
+| ![Login](docs/screenshots/login.jpg) | ![Register](docs/screenshots/register.jpg) |
+| *Login — document-like deposit slip with corner cut-marks.* | *Register — role picker as two document-stamped tiles, not a checkbox.* |
+
+![Manifest with sold-out stamp](docs/screenshots/manifest-stamp.jpg)
+
+*Scroll of the manifest showing lots №002 BMW M3 E30 (sold-out, rubber-stamped) and №003 Toyota Land Cruiser.*
 
 ---
 
@@ -199,6 +209,25 @@ car_dealership_inventory_system/
 ```
 
 ---
+
+## Design direction
+
+Explicit anti-SaaS. The brief was *"a car dealership inventory system"* — so I
+leaned into dealer vernacular (window-stickers, bills of sale, lot numbers,
+odometers, VIN plates) rather than the default "dark dashboard with a
+glowing orange CTA." After installing the `frontend-design` skill and
+reading its catalog of AI-generated tells (dark + vermilion accent,
+single-word color accents in headlines, ALL-CAPS tracked eyebrows,
+identical rounded cards in a 3-column grid), the first UI iteration was
+scrapped and rebuilt as a bone-cream *manifest* document.
+
+| Decision                | Why                                               |
+| ----------------------- | ------------------------------------------------- |
+| **Bone paper, not dark** | Dealer floor documents are physical, warm, printed. Not an app. |
+| **Fraunces + JetBrains Mono** | Variable serif for display drama + monospace for all data (prices, VINs, mileage). Two families, no Inter. |
+| **No cards, hairline rules** | The manifest is a long typographic ledger. Each lot gets a 12-col row divided by hairlines, not a card. |
+| **One accent (rust #B33F1A)** | Used ~3 places total on screen (focus ring, selection, SOLD OUT stamp). |
+| **Rubber-stamped SOLD OUT** | The one bold moment — rotated italic serif in a thick rust border; animates on mount. |
 
 ## My AI Usage
 

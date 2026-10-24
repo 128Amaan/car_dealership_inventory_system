@@ -21,25 +21,64 @@ export default function Register() {
       login(data.access_token);
       nav('/', { replace: true });
     } catch (e) {
-      setErr(explainError(e, 'Registration failed'));
+      setErr(explainError(e, 'The registrar declined your entry.'));
     } finally { setBusy(false); }
   }
 
   return (
-    <AuthShell title="Join the showroom" subtitle="Register to browse and purchase vehicles.">
-      <form onSubmit={submit} className="grid gap-4">
-        <div><label className="label">Email</label><input className="input" required type="email" value={email} onChange={e => setEmail(e.target.value)} /></div>
-        <div><label className="label">Password (min 6 chars)</label><input className="input" required type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} /></div>
-        <label className="flex items-center gap-2 text-sm text-chrome/70">
-          <input type="checkbox" checked={isAdmin} onChange={e => setIsAdmin(e.target.checked)} className="h-4 w-4 rounded accent-accent" />
-          Register as admin (can create/edit/delete/restock)
+    <AuthShell
+      pretitle="Baldwin & Co. · open an account"
+      title="New ledger."
+      subtitle="Patrons receive a line in the ledger. Floor managers receive the keys."
+    >
+      <form onSubmit={submit} className="grid gap-6">
+        <label className="block">
+          <span className="label">Preferred email</span>
+          <input className="input" required type="email" value={email} onChange={e => setEmail(e.target.value)} />
         </label>
-        {err && <div className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300 ring-1 ring-red-500/30">{err}</div>}
-        <button className="btn-accent" disabled={busy}>{busy ? 'Creating…' : 'Create account'}</button>
-        <p className="text-center text-sm text-chrome/60">
-          Already registered? <Link to="/login" className="text-accent hover:underline">Sign in</Link>
-        </p>
+        <label className="block">
+          <span className="label">Choose a pass-code (6+ characters)</span>
+          <input className="input" required type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} />
+        </label>
+
+        {/* Role selector: not a checkbox at the bottom. Two document-stamped choices. */}
+        <div>
+          <span className="label">Account class</span>
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <RoleTile active={!isAdmin}  onClick={() => setIsAdmin(false)}
+                      title="Patron"    body="Browse, filter, purchase." />
+            <RoleTile active={isAdmin}   onClick={() => setIsAdmin(true)}
+                      title="Floor mgr" body="Keys to add, amend, restock, strike." />
+          </div>
+        </div>
+
+        {err && <div className="border border-rust px-3 py-2 text-sm text-rust font-mono">{err}</div>}
+        <div className="flex items-center justify-between pt-4 border-t border-ink">
+          <Link to="/login" className="punch text-ink hover:text-rust transition">[ already enrolled ]</Link>
+          <button className="btn-ink" disabled={busy}>{busy ? 'Filing…' : 'File my entry'}</button>
+        </div>
       </form>
     </AuthShell>
+  );
+}
+
+function RoleTile({ active, onClick, title, body }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-left px-3 py-3 border transition
+        ${active
+          ? 'bg-ink text-paper border-ink'
+          : 'bg-transparent text-ink border-ink/40 hover:border-ink'}
+      `}
+      style={{ borderRadius: 0 }}
+    >
+      <span className={`punch block ${active ? 'text-paper/70' : 'text-mute'}`}>
+        {active ? '◉ selected' : '○ class'}
+      </span>
+      <span className="font-display italic font-bold text-xl block leading-none mt-1">{title}</span>
+      <span className={`text-[11px] block mt-2 ${active ? 'text-paper/80' : 'text-mute'}`}>{body}</span>
+    </button>
   );
 }

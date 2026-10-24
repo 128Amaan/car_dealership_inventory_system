@@ -1,11 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { VehicleCard } from '../components/VehicleCard';
+import { VehicleRow } from '../components/VehicleRow';
 import { Modal } from '../components/Modal';
 import { VehicleForm } from '../components/VehicleForm';
 
 const EMPTY_SEARCH = { make: '', model: '', category: '', min: '', max: '' };
+
+// Today's date in a dealer-plate format: "WED · 24.X.26"
+function stamp() {
+  const d = new Date();
+  const day = ['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()];
+  const month = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][d.getMonth()];
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${day} · ${String(d.getDate()).padStart(2,'0')}.${month}.${yy}`;
+}
 
 export default function Dashboard() {
   const { isAdmin } = useAuth();
@@ -35,7 +44,7 @@ export default function Dashboard() {
       const { data } = await api.get(url, { params });
       setVehicles(data);
     } catch (e) {
-      setErr(e?.response?.data?.detail ?? 'Failed to load vehicles');
+      setErr(e?.response?.data?.detail ?? 'The register is unreachable.');
     } finally { setLoading(false); }
   }, [filters]);
 
@@ -46,15 +55,15 @@ export default function Dashboard() {
     try {
       const { data } = await api.post(`/vehicles/${id}/purchase`);
       setVehicles(xs => xs.map(v => v.id === id ? data : v));
-    } catch (e) { alert(e?.response?.data?.detail ?? 'Purchase failed'); }
+    } catch (e) { alert(e?.response?.data?.detail ?? 'Purchase refused'); }
     finally { setBusyId(null); }
   }
 
   async function remove(id) {
-    if (!confirm('Delete this vehicle?')) return;
+    if (!confirm('Strike this entry from the register?')) return;
     setBusyId(id);
     try { await api.delete(`/vehicles/${id}`); setVehicles(xs => xs.filter(v => v.id !== id)); }
-    catch (e) { alert(e?.response?.data?.detail ?? 'Delete failed'); }
+    catch (e) { alert(e?.response?.data?.detail ?? 'Could not strike'); }
     finally { setBusyId(null); }
   }
 
@@ -77,72 +86,88 @@ export default function Dashboard() {
       const { data } = await api.post(`/vehicles/${restocking.id}/restock`, { amount: restockAmt });
       setVehicles(xs => xs.map(v => v.id === restocking.id ? data : v));
       setRestocking(null); setRestockAmt(1);
-    } catch (e) { alert(e?.response?.data?.detail ?? 'Restock failed'); }
+    } catch (e) { alert(e?.response?.data?.detail ?? 'Restock refused'); }
   }
 
   const stats = useMemo(() => ({
     total: vehicles.length,
     units: vehicles.reduce((s, v) => s + v.quantity, 0),
     value: vehicles.reduce((s, v) => s + v.quantity * v.price, 0),
+    sold:  vehicles.filter(v => v.quantity <= 0).length,
   }), [vehicles]);
 
   return (
-    <div className="relative isolate">
-      <section className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 grid-bg opacity-25" />
-        <div className="absolute -right-24 top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-accent/25 blur-3xl animate-float" />
-        <div className="relative mx-auto max-w-7xl px-6 py-14">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <span className="chip border border-accent/30 bg-accent/10 text-accent">live inventory</span>
-              <h1 className="mt-3 font-display text-4xl font-bold leading-tight text-chrome md:text-5xl">
-                The showroom, <span className="text-accent">reimagined</span>.
-              </h1>
-              <p className="mt-3 max-w-xl text-sm text-chrome/60">
-                Browse every vehicle in stock, filter by make, model, category or price,
-                and complete a purchase in a single click.
-              </p>
+    <div className="mx-auto max-w-[1360px] px-6 lg:px-10">
+
+      {/* ───────── Masthead ───────── */}
+      <section className="pt-10 lg:pt-16 pb-8 border-b border-ink">
+        <div className="grid grid-cols-12 gap-6 items-end">
+          <div className="col-span-12 lg:col-span-9">
+            <div className="punch text-mute mb-5">
+              folio vi · {stamp()} · showroom floor
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <StatTile label="Listings" value={stats.total} />
-              <StatTile label="Units" value={stats.units} />
-              <StatTile label="Lot Value" value={`$${(stats.value/1000).toFixed(0)}k`} />
-            </div>
+            <h1 className="font-display font-black italic text-ink leading-[0.85] text-manifest">
+              The&nbsp;Manifest.
+            </h1>
+            <p className="mt-6 max-w-xl text-ink text-base lg:text-lg leading-snug">
+              Every automobile presently on the floor, in order of entry. Prices firm.
+              <span className="italic text-mute"> Trade-ins by appointment only.</span>
+            </p>
           </div>
 
-          <div className="card mt-10 p-4 md:p-5">
-            <div className="grid gap-3 md:grid-cols-6">
-              <input className="input md:col-span-1" placeholder="Make"     value={filters.make}     onChange={e => setFilters(f => ({...f, make: e.target.value}))} />
-              <input className="input md:col-span-1" placeholder="Model"    value={filters.model}    onChange={e => setFilters(f => ({...f, model: e.target.value}))} />
-              <input className="input md:col-span-1" placeholder="Category" value={filters.category} onChange={e => setFilters(f => ({...f, category: e.target.value}))} />
-              <input className="input md:col-span-1" type="number" placeholder="Min $" value={filters.min} onChange={e => setFilters(f => ({...f, min: e.target.value}))} />
-              <input className="input md:col-span-1" type="number" placeholder="Max $" value={filters.max} onChange={e => setFilters(f => ({...f, max: e.target.value}))} />
-              <div className="flex gap-2 md:col-span-1">
-                <button className="btn-ghost flex-1" onClick={() => setFilters(EMPTY_SEARCH)}>Clear</button>
-                {isAdmin && <button className="btn-accent flex-1" onClick={() => setCreating(true)}>+ Add</button>}
-              </div>
-            </div>
+          <div className="col-span-12 lg:col-span-3">
+            <dl className="grid grid-cols-2 lg:grid-cols-1 gap-y-4">
+              <StatLine label="listings on floor" value={stats.total} />
+              <StatLine label="units in stock"    value={stats.units} />
+              <StatLine label="asking (floor)"    value={`$${(stats.value/1000).toFixed(1)}k`} />
+              <StatLine label="sold out"          value={stats.sold} tone="rust" />
+            </dl>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        {err && <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">{err}</div>}
+      {/* ───────── Search / search bar as a form card ───────── */}
+      <section className="pt-6 pb-2 border-b border-ink">
+        <div className="flex items-center gap-6 mb-4">
+          <span className="punch text-mute">query the register</span>
+          <div className="rule flex-1" />
+        </div>
+        <div className="grid grid-cols-12 gap-x-6 gap-y-3 items-end">
+          <SearchField   label="Make"     value={filters.make}     onChange={v => setFilters(f => ({...f, make:v}))} />
+          <SearchField   label="Model"    value={filters.model}    onChange={v => setFilters(f => ({...f, model:v}))} />
+          <SearchField   label="Category" value={filters.category} onChange={v => setFilters(f => ({...f, category:v}))} />
+          <SearchField   label="min $"    type="number" value={filters.min} onChange={v => setFilters(f => ({...f, min:v}))} />
+          <SearchField   label="max $"    type="number" value={filters.max} onChange={v => setFilters(f => ({...f, max:v}))} />
+          <div className="col-span-12 lg:col-span-2 flex gap-2 justify-end">
+            <button className="btn-wire" onClick={() => setFilters(EMPTY_SEARCH)}>Clear</button>
+            {isAdmin && <button className="btn-ink" onClick={() => setCreating(true)}>+ Add entry</button>}
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── The Manifest ───────── */}
+      <section className="pb-24">
+        {err && <div className="my-6 border border-rust px-4 py-3 text-rust font-mono text-sm">{err}</div>}
         {loading ? (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({length: 6}).map((_, i) => <div key={i} className="card h-56 animate-pulse" />)}
+          <div className="pt-10 pb-20 text-center punch text-mute animate-pulse">
+            opening the register ·  ·  ·
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="card grid place-items-center p-16 text-center text-chrome/60">
-            <div className="text-5xl">🚗</div>
-            <p className="mt-3">No vehicles match your filters.</p>
+          <div className="py-24 text-center">
+            <div className="font-display italic text-ink text-4xl">
+              No entries match this query.
+            </div>
+            <div className="punch text-mute mt-3">
+              clear the filters, or add the first vehicle.
+            </div>
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {vehicles.map(v => (
-              <VehicleCard
+          <div>
+            {vehicles.map((v, i) => (
+              <VehicleRow
                 key={v.id}
                 vehicle={v}
+                index={i}
                 isAdmin={isAdmin}
                 busy={busyId === v.id}
                 onPurchase={() => purchase(v.id)}
@@ -151,25 +176,38 @@ export default function Dashboard() {
                 onRestock={() => { setRestocking(v); setRestockAmt(1); }}
               />
             ))}
+            {/* Final hairline close */}
+            <div className="border-t border-ink mt-0 pt-5 flex justify-between punch text-mute">
+              <span>end of folio vi</span>
+              <span>— baldwin &amp; co · plate 0012-NY</span>
+            </div>
           </div>
         )}
       </section>
 
-      <Modal open={creating} onClose={() => setCreating(false)} title="Add vehicle">
-        <VehicleForm onSubmit={createVehicle} onCancel={() => setCreating(false)} submitLabel="Create" />
+      {/* ─────────── Modals ─────────── */}
+      <Modal open={creating} onClose={() => setCreating(false)} title="New entry to the register">
+        <VehicleForm onSubmit={createVehicle} onCancel={() => setCreating(false)} submitLabel="File entry" />
       </Modal>
-      <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit vehicle">
-        <VehicleForm initial={editing ?? undefined} onSubmit={updateVehicle} onCancel={() => setEditing(null)} submitLabel="Save changes" />
+      <Modal open={!!editing} onClose={() => setEditing(null)} title="Amend entry">
+        <VehicleForm initial={editing ?? undefined} onSubmit={updateVehicle} onCancel={() => setEditing(null)} submitLabel="File amendment" />
       </Modal>
-      <Modal open={!!restocking} onClose={() => setRestocking(null)} title={`Restock ${restocking?.make ?? ''} ${restocking?.model ?? ''}`}>
-        <div className="grid gap-4">
-          <div>
-            <label className="label">Add units</label>
+      <Modal
+        open={!!restocking}
+        onClose={() => setRestocking(null)}
+        title={restocking ? `Restock — ${restocking.make} ${restocking.model}` : ''}
+      >
+        <div className="grid gap-5">
+          <label className="block">
+            <span className="label">Units received</span>
             <input className="input" type="number" min={1} value={restockAmt} onChange={e => setRestockAmt(Number(e.target.value))} />
-          </div>
-          <div className="flex justify-end gap-2">
-            <button className="btn-ghost" onClick={() => setRestocking(null)}>Cancel</button>
-            <button className="btn-accent" onClick={doRestock}>Add to stock</button>
+          </label>
+          <div className="flex justify-between items-center border-t border-ink pt-4">
+            <span className="punch text-mute">entered against lot</span>
+            <div className="flex gap-2">
+              <button className="btn-wire" onClick={() => setRestocking(null)}>Cancel</button>
+              <button className="btn-ink" onClick={doRestock}>Record receipt</button>
+            </div>
           </div>
         </div>
       </Modal>
@@ -177,11 +215,29 @@ export default function Dashboard() {
   );
 }
 
-function StatTile({ label, value }) {
+/* ─── Masthead stats ─── */
+function StatLine({ label, value, tone }) {
   return (
-    <div className="card px-4 py-3">
-      <div className="text-[10px] uppercase tracking-widest text-chrome/50">{label}</div>
-      <div className="mt-1 font-display text-xl font-bold text-chrome tabular-nums">{value}</div>
+    <div className="flex items-baseline justify-between gap-3 border-b border-hair pb-1">
+      <span className="punch text-mute">{label}</span>
+      <span className={`odo text-2xl font-bold ${tone === 'rust' ? 'text-rust' : 'text-ink'}`}>
+        {value}
+      </span>
     </div>
+  );
+}
+
+/* ─── Search field ─── */
+function SearchField({ label, value, onChange, type = 'text' }) {
+  return (
+    <label className="col-span-6 lg:col-span-2 block">
+      <span className="label">{label}</span>
+      <input
+        className="input"
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </label>
   );
 }

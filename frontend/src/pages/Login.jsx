@@ -19,37 +19,78 @@ export default function Login() {
       login(data.access_token);
       nav(loc.state?.from ?? '/', { replace: true });
     } catch (e) {
-      setErr(explainError(e, 'Login failed'));
+      setErr(explainError(e, 'Credentials refused.'));
     } finally { setBusy(false); }
   }
 
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to the showroom.">
-      <form onSubmit={submit} className="grid gap-4">
-        <div><label className="label">Email</label><input className="input" required type="email" value={email} onChange={e => setEmail(e.target.value)} /></div>
-        <div><label className="label">Password</label><input className="input" required type="password" value={password} onChange={e => setPassword(e.target.value)} /></div>
-        {err && <div className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300 ring-1 ring-red-500/30">{err}</div>}
-        <button className="btn-accent" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-        <p className="text-center text-sm text-chrome/60">
-          New here? <Link to="/register" className="text-accent hover:underline">Create an account</Link>
-        </p>
+    <AuthShell
+      pretitle="Baldwin & Co. · staff & patrons"
+      title="Return visit."
+      subtitle="State your name and the register will open."
+    >
+      <form onSubmit={submit} className="grid gap-6">
+        <label className="block">
+          <span className="label">Patron email</span>
+          <input className="input" required type="email" value={email} onChange={e => setEmail(e.target.value)} />
+        </label>
+        <label className="block">
+          <span className="label">Pass-code</span>
+          <input className="input" required type="password" value={password} onChange={e => setPassword(e.target.value)} />
+        </label>
+        {err && <div className="border border-rust px-3 py-2 text-sm text-rust font-mono">{err}</div>}
+        <div className="flex items-center justify-between pt-4 border-t border-ink">
+          <Link to="/register" className="punch text-ink hover:text-rust transition">[ open an account ]</Link>
+          <button className="btn-ink" disabled={busy}>{busy ? 'Opening…' : 'Open the register'}</button>
+        </div>
       </form>
     </AuthShell>
   );
 }
 
-export function AuthShell({ title, subtitle, children }) {
+export function AuthShell({ pretitle, title, subtitle, children }) {
   return (
-    <div className="relative isolate flex min-h-[calc(100vh-80px)] items-center justify-center overflow-hidden px-6 py-12">
-      <div className="absolute inset-0 grid-bg opacity-30" />
-      <div className="absolute -top-40 right-10 h-96 w-96 rounded-full bg-accent/30 blur-3xl" />
-      <div className="relative w-full max-w-md">
-        <div className="mb-6 text-center">
-          <h1 className="font-display text-3xl font-bold text-chrome">{title}</h1>
-          <p className="mt-2 text-sm text-chrome/60">{subtitle}</p>
+    <div className="mx-auto max-w-[1360px] px-6 lg:px-10 pt-16 lg:pt-24 pb-24">
+      <div className="grid grid-cols-12 gap-10">
+        {/* Giant left column — editorial */}
+        <aside className="col-span-12 lg:col-span-6 lg:sticky lg:top-24 self-start">
+          <div className="punch text-mute mb-4">{pretitle}</div>
+          <h1 className="font-display italic font-black text-ink leading-[0.85] text-[clamp(3rem,8vw,7rem)]">
+            {title}
+          </h1>
+          <p className="mt-6 text-ink text-lg max-w-md leading-snug">{subtitle}</p>
+
+          {/* a little hairline chart / signature block */}
+          <div className="mt-10 border-t border-ink pt-4">
+            <div className="punch text-mute">floor hours</div>
+            <div className="mt-2 flex items-baseline gap-4">
+              <span className="font-display font-black text-ink text-3xl">09.00</span>
+              <span className="odo text-mute">—</span>
+              <span className="font-display font-black text-ink text-3xl">19.00</span>
+              <span className="punch text-mute ml-2">tue–sat</span>
+            </div>
+          </div>
+        </aside>
+
+        {/* Right: the form, as a bordered deposit slip */}
+        <div className="col-span-12 lg:col-span-5 lg:col-start-8">
+          <div className="plate p-8 lg:p-10 relative">
+            {/* corner marks like a cut-here receipt */}
+            <Corner pos="tl" /><Corner pos="tr" /><Corner pos="bl" /><Corner pos="br" />
+            {children}
+          </div>
         </div>
-        <div className="card p-6">{children}</div>
       </div>
     </div>
   );
+}
+
+function Corner({ pos }) {
+  const map = {
+    tl: '-top-px -left-px border-t-2 border-l-2',
+    tr: '-top-px -right-px border-t-2 border-r-2',
+    bl: '-bottom-px -left-px border-b-2 border-l-2',
+    br: '-bottom-px -right-px border-b-2 border-r-2',
+  };
+  return <span className={`absolute w-4 h-4 border-ink ${map[pos]}`} />;
 }
