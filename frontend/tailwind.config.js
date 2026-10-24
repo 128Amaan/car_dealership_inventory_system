@@ -10,16 +10,17 @@ export default {
         script: ['"Caveat"', 'ui-serif', 'cursive'],
       },
       colors: {
-        paper:   '#E6DCC2',   // aged vintage cream
-        paper2:  '#D6C9A7',   // darker shadow / panel tone
-        paperD:  '#C7B98F',   // vignette shadow stops
-        ink:     '#1A1812',   // warm near-black
-        inkblue: '#1F3A5F',   // workshop blueprint blue (Chevy C10 accent)
-        signal:  '#B22222',   // muted brick red for warnings / price
-        epa:     '#D9BF2A',   // aged yellow
-        steel:   '#7A7466',
-        rule:    '#9A8F72',
-        mute:    '#5A5240',
+        paper:   '#D4B983',   // aged amber manuscript base
+        paper2:  '#C19F62',   // shadow panel tone
+        paperD:  '#8E7142',   // deep vignette stop (burnt edges)
+        ink:     '#2A1E10',   // deep sepia-brown (was near-black)
+        inkblue: '#2B4463',   // workshop blueprint blue (muted for amber ground)
+        signal:  '#9A2A1E',   // oxidized brick red
+        epa:     '#C4A030',   // amber-shifted yellow
+        steel:   '#6E5A3D',
+        rule:    '#8F7349',   // warm brown rule
+        mute:    '#5F4A2A',   // deep warm brown
+        stain:   '#5A3B1A',   // for foxing marks
       },
       letterSpacing: {
         punch: '0.14em',

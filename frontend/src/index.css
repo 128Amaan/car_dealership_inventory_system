@@ -3,48 +3,72 @@
 @tailwind utilities;
 
 :root {
-  --paper:   #E6DCC2;
-  --paper2:  #D6C9A7;
-  --paperD:  #C7B98F;
-  --ink:     #1A1812;
-  --inkblue: #1F3A5F;
-  --signal:  #B22222;
-  --epa:     #D9BF2A;
-  --steel:   #7A7466;
-  --rule:    #9A8F72;
-  --mute:    #5A5240;
+  --paper:   #D4B983;   /* aged amber manuscript base */
+  --paper2:  #C19F62;
+  --paperD:  #8E7142;   /* deep vignette stop (burnt corners) */
+  --ink:     #2A1E10;   /* deep sepia-brown */
+  --inkblue: #2B4463;
+  --signal:  #9A2A1E;   /* oxidized brick red */
+  --epa:     #C4A030;
+  --steel:   #6E5A3D;
+  --rule:    #8F7349;
+  --mute:    #5F4A2A;
+  --stain:   #5A3B1A;
 }
 
 @layer base {
   html, body, #root { height: 100%; }
 
-  /* Aged paper: base cream + two-layer grain + vignette darkening at edges */
+  /* ─────────────────────────────────────────────────────────── */
+  /* Aged-manuscript body background                              */
+  /* Layered: dark burnt-edge vignette + scattered foxing stains  */
+  /* + warm fiber grain + fine speckle. Everything multiplies     */
+  /* onto a deep amber base.                                      */
+  /* ─────────────────────────────────────────────────────────── */
   body {
     background-color: var(--paper);
     background-image:
-      /* vignette */
-      radial-gradient(ellipse at 50% 40%, transparent 55%, rgba(90,70,30,0.18) 100%),
-      /* coarse paper fiber */
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.15  0 0 0 0 0.08  0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
-      /* fine speckle */
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='turbulence' baseFrequency='2.4' numOctaves='1' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    background-attachment: fixed, fixed, fixed;
+      /* FOXING / stain blotches — darker warm-brown radial pools at off-grid positions */
+      radial-gradient(ellipse 180px 240px at 12% 18%, rgba(90,59,26,0.35),  transparent 70%),
+      radial-gradient(ellipse 260px 180px at 88% 22%, rgba(90,59,26,0.28),  transparent 70%),
+      radial-gradient(ellipse 200px 140px at 72% 68%, rgba(90,59,26,0.30),  transparent 70%),
+      radial-gradient(ellipse 220px 320px at 24% 82%, rgba(60,38,16,0.26),  transparent 72%),
+      radial-gradient(ellipse 140px 160px at 54% 42%, rgba(90,59,26,0.18),  transparent 70%),
+      radial-gradient(ellipse 180px 140px at 94% 92%, rgba(60,38,16,0.42),  transparent 70%),
+
+      /* Strong burnt-edge vignette — four corner-biased ellipses */
+      radial-gradient(ellipse at 0% 0%,     rgba(42,23,8,0.55),  transparent 50%),
+      radial-gradient(ellipse at 100% 0%,   rgba(42,23,8,0.45),  transparent 50%),
+      radial-gradient(ellipse at 0% 100%,   rgba(42,23,8,0.55),  transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(42,23,8,0.55),  transparent 50%),
+
+      /* Overall center-is-brighter vignette */
+      radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(60,38,16,0.35) 100%),
+
+      /* Coarse paper fiber */
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.22  0 0 0 0 0.17  0 0 0 0 0.08  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+
+      /* Fine speckle (toner specks) */
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='turbulence' baseFrequency='2.6' numOctaves='1' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.14  0 0 0 0 0.09  0 0 0 0 0.04  0 0 0 0.10 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+    background-attachment: fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed, fixed;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat;
   }
 
   * { font-variant-numeric: tabular-nums; }
 
-  ::selection { background: var(--inkblue); color: var(--paper); }
+  ::selection { background: var(--ink); color: var(--paper); }
 
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--ink); border: 3px solid var(--paper); border-radius: 0; }
 
   :focus-visible {
-    outline: 2px solid var(--inkblue);
+    outline: 2px solid var(--signal);
     outline-offset: 3px;
   }
 
-  h1, h2, h3, h4 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; line-height: 0.85; letter-spacing: -0.015em; }
+  h1, h2, h3, h4 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; line-height: 0.85; letter-spacing: -0.015em; color: var(--ink); }
 }
 
 @layer components {
@@ -53,7 +77,7 @@
     @apply w-full bg-transparent border-0 border-b border-ink/80 rounded-none
            px-0 py-2 text-ink placeholder:text-mute
            font-mono text-sm outline-none transition
-           focus:border-inkblue focus:border-b-2;
+           focus:border-signal focus:border-b-2;
   }
   .label {
     @apply mb-1 block text-[10px] font-mono tracking-punch text-mute uppercase;
@@ -67,29 +91,61 @@
            disabled:cursor-not-allowed disabled:opacity-30
            active:translate-y-[1px];
   }
-  .btn-ink    { @apply btn bg-ink text-paper hover:bg-inkblue; }
+  .btn-ink    { @apply btn text-paper hover:bg-signal; background-color: var(--ink); }
   .btn-wire   { @apply btn bg-transparent text-ink border border-ink
                        hover:bg-ink hover:text-paper; }
   .btn-danger { @apply btn bg-transparent text-signal border border-signal
                        hover:bg-signal hover:text-paper; }
 
   /* ── Document surfaces ─────────────────────────────────────── */
-  .plate     { @apply bg-paper border border-ink rounded-none; }
+  /* .plate / .poster now get their own "paper sheet" treatment:
+     slightly brighter amber center, darker burnt edges, with a
+     torn/aged inner shadow. Each sheet looks like a separate page.  */
+  .plate {
+    @apply relative border rounded-none;
+    border-color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(ellipse at 50% 40%, rgba(236,206,146,0.35), transparent 65%),
+      radial-gradient(ellipse at 0% 0%,     rgba(42,23,8,0.25), transparent 42%),
+      radial-gradient(ellipse at 100% 100%, rgba(42,23,8,0.28), transparent 44%);
+    box-shadow:
+      inset 0 0 60px rgba(60,38,16,0.35),
+      0 2px 0 0 rgba(42,23,8,0.4);
+  }
 
-  /* ── The COLLECTOR POSTER — magazine-cover vehicle sheet ──── */
+  /* COLLECTOR POSTER — the manuscript "page" */
   .poster {
-    @apply relative bg-paper border-[3px] border-ink rounded-none;
-    box-shadow: 6px 6px 0 0 rgba(26,24,18,0.9);
+    @apply relative rounded-none;
+    border: 3px solid var(--ink);
+    background-color: var(--paper);
+    background-image:
+      /* subtle brighter center */
+      radial-gradient(ellipse at 50% 35%, rgba(236,206,146,0.40), transparent 60%),
+      /* own corner-burn */
+      radial-gradient(ellipse at 0% 0%,     rgba(42,23,8,0.38), transparent 45%),
+      radial-gradient(ellipse at 100% 0%,   rgba(42,23,8,0.30), transparent 45%),
+      radial-gradient(ellipse at 0% 100%,   rgba(42,23,8,0.38), transparent 48%),
+      radial-gradient(ellipse at 100% 100%, rgba(42,23,8,0.42), transparent 45%),
+      /* a couple foxing stains unique to this sheet */
+      radial-gradient(ellipse 180px 130px at 18% 72%, rgba(90,59,26,0.30), transparent 70%),
+      radial-gradient(ellipse 140px 180px at 82% 28%, rgba(90,59,26,0.26), transparent 70%),
+      /* fiber grain, same filter as body but lower alpha */
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='360'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.22  0 0 0 0 0.17  0 0 0 0 0.08  0 0 0 0.11 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    box-shadow:
+      inset 0 0 80px rgba(60,38,16,0.45),
+      6px 6px 0 0 rgba(42,23,8,0.9);
   }
 
   /* VIN / plate badge — small bordered mono token */
   .vin-plate {
     @apply inline-flex items-center gap-2 px-2 py-1
-           bg-paper2 border border-ink font-mono text-[10px] tracking-wide text-ink;
+           border border-ink font-mono text-[10px] tracking-wide text-ink;
+    background-color: var(--paper2);
     text-transform: uppercase;
   }
 
-  /* Rule that draws in on mount */
+  /* Rule animations */
   .rule {
     @apply h-[2px] bg-ink origin-left animate-rule;
   }
@@ -134,17 +190,19 @@
     background-color: var(--paper2);
   }
 
-  /* Tiny icon tile */
   .icon-tile {
-    @apply flex flex-col items-center gap-1 border border-ink p-2 bg-paper;
+    @apply flex flex-col items-center gap-1 border border-ink p-2;
+    background-color: rgba(212,185,131,0.55);
   }
 
-  /* "framed box" headlined panel like Chevy C10 reference */
+  /* Framed box with absolute title tab */
   .frame-box {
-    @apply border-2 border-ink p-3 bg-paper relative;
+    @apply border-2 border-ink p-3 relative;
+    background-color: rgba(212,185,131,0.55);
   }
   .frame-box-title {
-    @apply absolute -top-[9px] left-3 bg-paper px-2 font-mono text-[10px] tracking-punch uppercase text-ink;
+    @apply absolute -top-[9px] left-3 px-2 font-mono text-[10px] tracking-punch uppercase text-ink;
+    background-color: var(--paper);
   }
 }
 
