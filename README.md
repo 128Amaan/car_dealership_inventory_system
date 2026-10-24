@@ -68,20 +68,26 @@ Interactive OpenAPI docs: `http://localhost:8000/docs`.
 - Python 3.11+
 - Node 20+
 
-### Backend
+### One-command setup (recommended)
 
 ```bash
+npm run setup   # creates venv, installs backend + frontend deps
+npm run dev     # starts BOTH backend (:8000) and frontend (:5173)
+```
+
+Open <http://localhost:5173>.
+
+### Or run them separately
+
+**Backend:**
+```bash
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-Backend is now at <http://localhost:8000>. OpenAPI at `/docs`.
-
-### Frontend
-
+**Frontend (in another terminal):**
 ```bash
 cd frontend
 npm install
@@ -89,13 +95,17 @@ npm run dev   # http://localhost:5173
 ```
 
 The Vite dev server proxies `/api/*` to `http://localhost:8000` (see
-`vite.config.ts`), so no CORS fiddling is needed in development.
+`frontend/vite.config.js`), so no CORS fiddling is needed in development.
+
+> ⚠️ **Both must be running.** If the frontend shows "Can't reach the
+> backend at /api" on login/register, the uvicorn server isn't up —
+> `npm run dev` from the repo root starts both at once.
 
 ### Run the tests
 
 ```bash
-cd backend
-.venv/bin/pytest --cov=app --cov-report=term
+npm test
+# or: cd backend && .venv/bin/pytest --cov=app --cov-report=term
 ```
 
 Expected: **23 passed, 96% coverage**. Full report in

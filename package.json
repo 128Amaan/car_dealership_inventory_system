@@ -1,0 +1,19 @@
+{
+  "name": "car-dealership-inventory-system",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Full-stack car dealership kata — FastAPI + React + Tailwind",
+  "scripts": {
+    "dev":          "concurrently -n api,web -c magenta,cyan \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api":      "cd backend && .venv/bin/uvicorn app.main:app --reload --port 8000",
+    "dev:web":      "cd frontend && npm run dev",
+    "setup:api":    "cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt",
+    "setup:web":    "cd frontend && npm install",
+    "setup":        "npm run setup:api && npm run setup:web",
+    "test":         "cd backend && .venv/bin/pytest --cov=app",
+    "build":        "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

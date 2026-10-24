@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { api } from '../api';
+import { api, explainError } from '../api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -19,7 +19,7 @@ export default function Login() {
       login(data.access_token);
       nav(loc.state?.from ?? '/', { replace: true });
     } catch (e) {
-      setErr(e?.response?.data?.detail ?? 'Login failed');
+      setErr(explainError(e, 'Login failed'));
     } finally { setBusy(false); }
   }
 

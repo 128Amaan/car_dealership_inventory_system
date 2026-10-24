@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api';
+import { api, explainError } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { AuthShell } from './Login';
 
@@ -21,7 +21,7 @@ export default function Register() {
       login(data.access_token);
       nav('/', { replace: true });
     } catch (e) {
-      setErr(e?.response?.data?.detail ?? 'Registration failed');
+      setErr(explainError(e, 'Registration failed'));
     } finally { setBusy(false); }
   }
 
