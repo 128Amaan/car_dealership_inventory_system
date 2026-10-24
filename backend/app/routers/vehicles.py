@@ -7,6 +7,7 @@ from app.core.database import get_db
 from app.core.deps import get_current_user, require_admin
 from app.models.user import User
 from app.models.vehicle import Vehicle
+from app.schemas.inventory import RestockRequest
 from app.schemas.vehicle import VehicleCreate, VehicleOut, VehicleUpdate
 
 router = APIRouter(prefix="/api/vehicles", tags=["vehicles"])
@@ -74,6 +75,35 @@ def update_vehicle(
     vehicle = _get_or_404(db, vehicle_id)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(vehicle, field, value)
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle
+
+
+@router.post("/{vehicle_id}/purchase", response_model=VehicleOut)
+def purchase_vehicle(
+    vehicle_id: int,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+) -> Vehicle:
+    vehicle = _get_or_404(db, vehicle_id)
+    if vehicle.quantity <= 0:
+        raise HTTPException(status_code=400, detail="Vehicle is out of stock")
+    vehicle.quantity -= 1
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle
+
+
+@router.post("/{vehicle_id}/restock", response_model=VehicleOut)
+def restock_vehicle(
+    vehicle_id: int,
+    payload: RestockRequest,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
+) -> Vehicle:
+    vehicle = _get_or_404(db, vehicle_id)
+    vehicle.quantity += payload.amount
     db.commit()
     db.refresh(vehicle)
     return vehicle
