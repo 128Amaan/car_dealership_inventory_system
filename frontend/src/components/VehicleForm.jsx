@@ -46,9 +46,9 @@ export function VehicleForm({ initial, onSubmit, onCancel, submitLabel = 'File' 
       <Field label="Asking price (USD)"><input className="input" type="number" min={0} value={v.price} onChange={upd('price')} /></Field>
       <Field label="Units on floor"><input className="input" type="number" min={0} value={v.quantity} onChange={upd('quantity')} /></Field>
 
-      {err && <div className="md:col-span-2 border border-rust px-3 py-2 text-sm text-rust font-mono">{err}</div>}
+      {err && <div className="md:col-span-2 border-2 border-signal px-3 py-2 text-sm text-signal font-mono">{err}</div>}
 
-      <div className="md:col-span-2 flex justify-between items-center pt-4 mt-2 border-t border-ink">
+      <div className="md:col-span-2 flex justify-between items-center pt-4 mt-2 border-t-2 border-ink">
         <span className="punch text-mute">signed by registrar on receipt</span>
         <div className="flex gap-2">
           <button type="button" className="btn-wire" onClick={onCancel}>Cancel</button>

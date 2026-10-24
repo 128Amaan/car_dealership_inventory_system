@@ -1,19 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { VehicleRow } from '../components/VehicleRow';
+import { WindowSticker } from '../components/WindowSticker';
 import { Modal } from '../components/Modal';
 import { VehicleForm } from '../components/VehicleForm';
 
 const EMPTY_SEARCH = { make: '', model: '', category: '', min: '', max: '' };
 
-// Today's date in a dealer-plate format: "WED · 24.X.26"
-function stamp() {
+function printStamp() {
   const d = new Date();
-  const day = ['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()];
-  const month = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][d.getMonth()];
-  const yy = String(d.getFullYear()).slice(-2);
-  return `${day} · ${String(d.getDate()).padStart(2,'0')}.${month}.${yy}`;
+  const y = String(d.getFullYear()).slice(-2);
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${dd}/${m}/${y}`;
 }
 
 export default function Dashboard() {
@@ -97,74 +96,65 @@ export default function Dashboard() {
   }), [vehicles]);
 
   return (
-    <div className="mx-auto max-w-[1360px] px-6 lg:px-10">
+    <div className="mx-auto max-w-[1400px] px-6 lg:px-10">
 
-      {/* ───────── Masthead ───────── */}
-      <section className="pt-10 lg:pt-16 pb-8 border-b border-ink">
-        <div className="grid grid-cols-12 gap-6 items-end">
-          <div className="col-span-12 lg:col-span-9">
-            <div className="punch text-mute mb-5">
-              folio vi · {stamp()} · showroom floor
-            </div>
-            <h1 className="font-display font-black italic text-ink leading-[0.85] text-manifest">
-              The&nbsp;Manifest.
-            </h1>
-            <p className="mt-6 max-w-xl text-ink text-base lg:text-lg leading-snug">
-              Every automobile presently on the floor, in order of entry. Prices firm.
-              <span className="italic text-mute"> Trade-ins by appointment only.</span>
-            </p>
-          </div>
-
-          <div className="col-span-12 lg:col-span-3">
-            <dl className="grid grid-cols-2 lg:grid-cols-1 gap-y-4">
-              <StatLine label="listings on floor" value={stats.total} />
-              <StatLine label="units in stock"    value={stats.units} />
-              <StatLine label="asking (floor)"    value={`$${(stats.value/1000).toFixed(1)}k`} />
-              <StatLine label="sold out"          value={stats.sold} tone="rust" />
-            </dl>
+      {/* ─────────── Masthead — spec-sheet publication header ─────────── */}
+      <section className="pt-8 pb-5 border-b-2 border-ink">
+        <div className="punch text-mute flex items-center gap-4 flex-wrap">
+          <span>Vol. 6</span><span>·</span>
+          <span>Issue 24</span><span>·</span>
+          <span>Printed {printStamp()}</span><span>·</span>
+          <span>Baldwin &amp; Co. — Pre-Owned Automobile Register</span>
+        </div>
+        <div className="mt-4 grid grid-cols-12 gap-6 items-end">
+          <h1 className="col-span-12 lg:col-span-8 font-din font-black text-ink uppercase leading-[0.85] text-[clamp(3rem,8vw,8rem)] tracking-tight">
+            Floor&nbsp;Spec&nbsp;Sheets
+          </h1>
+          <div className="col-span-12 lg:col-span-4 grid grid-cols-2 gap-x-5 gap-y-2">
+            <StatRow label="listings"       value={stats.total} />
+            <StatRow label="units in stock" value={stats.units} />
+            <StatRow label="floor asking"   value={`$${(stats.value/1000).toFixed(1)}k`} />
+            <StatRow label="sold out"       value={stats.sold} tone="signal" />
           </div>
         </div>
       </section>
 
-      {/* ───────── Search / search bar as a form card ───────── */}
-      <section className="pt-6 pb-2 border-b border-ink">
-        <div className="flex items-center gap-6 mb-4">
+      {/* ─────────── Query bar ─────────── */}
+      <section className="pt-5 pb-4 border-b border-ink">
+        <div className="flex items-center gap-4 mb-3">
           <span className="punch text-mute">query the register</span>
           <div className="rule flex-1" />
         </div>
-        <div className="grid grid-cols-12 gap-x-6 gap-y-3 items-end">
-          <SearchField   label="Make"     value={filters.make}     onChange={v => setFilters(f => ({...f, make:v}))} />
-          <SearchField   label="Model"    value={filters.model}    onChange={v => setFilters(f => ({...f, model:v}))} />
-          <SearchField   label="Category" value={filters.category} onChange={v => setFilters(f => ({...f, category:v}))} />
-          <SearchField   label="min $"    type="number" value={filters.min} onChange={v => setFilters(f => ({...f, min:v}))} />
-          <SearchField   label="max $"    type="number" value={filters.max} onChange={v => setFilters(f => ({...f, max:v}))} />
+        <div className="grid grid-cols-12 gap-x-5 gap-y-3 items-end">
+          <SearchField label="Make"     value={filters.make}     onChange={v => setFilters(f => ({...f, make:v}))} />
+          <SearchField label="Model"    value={filters.model}    onChange={v => setFilters(f => ({...f, model:v}))} />
+          <SearchField label="Category" value={filters.category} onChange={v => setFilters(f => ({...f, category:v}))} />
+          <SearchField label="min $"    type="number" value={filters.min} onChange={v => setFilters(f => ({...f, min:v}))} />
+          <SearchField label="max $"    type="number" value={filters.max} onChange={v => setFilters(f => ({...f, max:v}))} />
           <div className="col-span-12 lg:col-span-2 flex gap-2 justify-end">
             <button className="btn-wire" onClick={() => setFilters(EMPTY_SEARCH)}>Clear</button>
-            {isAdmin && <button className="btn-ink" onClick={() => setCreating(true)}>+ Add entry</button>}
+            {isAdmin && <button className="btn-ink" onClick={() => setCreating(true)}>+ New sticker</button>}
           </div>
         </div>
       </section>
 
-      {/* ───────── The Manifest ───────── */}
-      <section className="pb-24">
-        {err && <div className="my-6 border border-rust px-4 py-3 text-rust font-mono text-sm">{err}</div>}
+      {/* ─────────── Grid of window stickers ─────────── */}
+      <section className="pt-8 pb-24">
+        {err && <div className="my-4 border-2 border-signal px-4 py-3 text-signal font-mono text-sm">{err}</div>}
+
         {loading ? (
-          <div className="pt-10 pb-20 text-center punch text-mute animate-pulse">
-            opening the register ·  ·  ·
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {Array.from({length: 4}).map((_, i) => <div key={i} className="sticker h-80 animate-pulse" />)}
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="py-24 text-center">
-            <div className="font-display italic text-ink text-4xl">
-              No entries match this query.
-            </div>
-            <div className="punch text-mute mt-3">
-              clear the filters, or add the first vehicle.
-            </div>
+          <div className="py-20 text-center plate p-10">
+            <div className="font-din font-black text-ink text-5xl uppercase">No matches on floor.</div>
+            <div className="punch text-mute mt-3">clear the filters, or print a new sticker.</div>
           </div>
         ) : (
-          <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {vehicles.map((v, i) => (
-              <VehicleRow
+              <WindowSticker
                 key={v.id}
                 vehicle={v}
                 index={i}
@@ -176,20 +166,20 @@ export default function Dashboard() {
                 onRestock={() => { setRestocking(v); setRestockAmt(1); }}
               />
             ))}
-            {/* Final hairline close */}
-            <div className="border-t border-ink mt-0 pt-5 flex justify-between punch text-mute">
-              <span>end of folio vi</span>
-              <span>— baldwin &amp; co · plate 0012-NY</span>
-            </div>
           </div>
         )}
+
+        <div className="mt-10 border-t-2 border-ink pt-4 flex justify-between punch text-mute">
+          <span>end of issue 24 · {vehicles.length}&nbsp;stickers printed</span>
+          <span>Baldwin &amp; Co. · plate 0012-NY</span>
+        </div>
       </section>
 
       {/* ─────────── Modals ─────────── */}
-      <Modal open={creating} onClose={() => setCreating(false)} title="New entry to the register">
-        <VehicleForm onSubmit={createVehicle} onCancel={() => setCreating(false)} submitLabel="File entry" />
+      <Modal open={creating} onClose={() => setCreating(false)} title="New sticker — vehicle intake">
+        <VehicleForm onSubmit={createVehicle} onCancel={() => setCreating(false)} submitLabel="Print sticker" />
       </Modal>
-      <Modal open={!!editing} onClose={() => setEditing(null)} title="Amend entry">
+      <Modal open={!!editing} onClose={() => setEditing(null)} title="Amend sticker">
         <VehicleForm initial={editing ?? undefined} onSubmit={updateVehicle} onCancel={() => setEditing(null)} submitLabel="File amendment" />
       </Modal>
       <Modal
@@ -202,8 +192,8 @@ export default function Dashboard() {
             <span className="label">Units received</span>
             <input className="input" type="number" min={1} value={restockAmt} onChange={e => setRestockAmt(Number(e.target.value))} />
           </label>
-          <div className="flex justify-between items-center border-t border-ink pt-4">
-            <span className="punch text-mute">entered against lot</span>
+          <div className="flex justify-between items-center border-t-2 border-ink pt-4">
+            <span className="punch text-mute">receipt against lot</span>
             <div className="flex gap-2">
               <button className="btn-wire" onClick={() => setRestocking(null)}>Cancel</button>
               <button className="btn-ink" onClick={doRestock}>Record receipt</button>
@@ -215,19 +205,19 @@ export default function Dashboard() {
   );
 }
 
-/* ─── Masthead stats ─── */
-function StatLine({ label, value, tone }) {
+/* ─── Masthead stat row — one line, hairline underline ─── */
+function StatRow({ label, value, tone }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-hair pb-1">
+    <div className="flex items-baseline justify-between gap-3 border-b border-dotted" style={{borderColor: 'var(--rule)'}}>
       <span className="punch text-mute">{label}</span>
-      <span className={`odo text-2xl font-bold ${tone === 'rust' ? 'text-rust' : 'text-ink'}`}>
+      <span className={`font-din font-black text-2xl tabular-nums ${tone === 'signal' ? 'text-signal' : 'text-ink'}`}>
         {value}
       </span>
     </div>
   );
 }
 
-/* ─── Search field ─── */
+/* ─── Search field — simple hairline input ─── */
 function SearchField({ label, value, onChange, type = 'text' }) {
   return (
     <label className="col-span-6 lg:col-span-2 block">

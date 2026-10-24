@@ -4,35 +4,32 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Fraunces"', 'ui-serif', 'Georgia', 'serif'],
-        mono:    ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        din:    ['"Barlow Condensed"', 'ui-sans-serif', 'system-ui'],
+        body:   ['"Barlow"', 'ui-sans-serif', 'system-ui'],
+        mono:   ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        paper:   '#F2EDE1',
-        ink:     '#0E0E0C',
-        rust:    '#B33F1A',
-        moss:    '#3F4A3A',
-        signal:  '#E6C01A',
-        hair:    '#C8BFAD',  // hairline rule
-        mute:    '#6B6659',  // secondary ink
-      },
-      fontSize: {
-        'manifest': ['clamp(2.5rem, 7vw, 6.5rem)', { lineHeight: '0.9', letterSpacing: '-0.03em' }],
-        'ticker':   ['clamp(1.5rem, 4vw, 3rem)',   { lineHeight: '0.95', letterSpacing: '-0.02em' }],
+        paper:   '#EFECE3',
+        paper2:  '#E6E2D6',   // slightly darker, for stamped boxes
+        ink:     '#0C0C0A',
+        signal:  '#D21919',   // signal-red, used sparingly
+        epa:     '#F3D421',   // epa-yellow — fuel-economy panel ONLY
+        steel:   '#8A8E8F',
+        rule:    '#B9B3A3',
+        mute:    '#5E5A4F',
       },
       letterSpacing: {
-        'punch':   '0.14em',
+        punch: '0.14em',
+        wide2: '0.08em',
       },
       keyframes: {
         rule:   { '0%': { transform: 'scaleX(0)' }, '100%': { transform: 'scaleX(1)' } },
-        stamp:  { '0%': { transform: 'rotate(-18deg) scale(1.6)', opacity: '0' },
-                  '60%': { transform: 'rotate(-10deg) scale(0.95)', opacity: '1' },
+        stamp:  { '0%': { transform: 'rotate(-6deg) scale(1.1)', opacity: '0' },
                   '100%': { transform: 'rotate(-6deg) scale(1)', opacity: '1' } },
-        tick:   { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(0)' } },
       },
       animation: {
-        rule:  'rule 600ms cubic-bezier(.2,.8,.2,1) both',
-        stamp: 'stamp 400ms cubic-bezier(.2,.8,.2,1) both',
+        rule:  'rule 500ms cubic-bezier(.2,.8,.2,1) both',
+        stamp: 'stamp 220ms cubic-bezier(.2,.8,.2,1) both',
       },
     },
   },

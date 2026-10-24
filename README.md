@@ -6,9 +6,14 @@ delete and restock inventory. Backend is FastAPI + SQLite with JWT auth;
 frontend is React + TypeScript + Tailwind. Backend logic is **test-driven**
 with a visible **Red → Green → Refactor** commit history.
 
-![Manifest](docs/screenshots/dashboard.jpg)
+![Floor spec sheets](docs/screenshots/dashboard.jpg)
 
-*The dashboard isn't a product grid — it's a **dealer's floor manifest**: a hairline-ruled ledger in Fraunces + JetBrains Mono, bone-paper background, one single rust accent, "SOLD OUT" literally rubber-stamped on out-of-stock lots.*
+*Each vehicle is a literal **Monroney-style window sticker** — bone-paper placard with lot plates, VIN stamp, EPA yellow fuel-economy block, dense Haynes-manual spec table, patent-drawing side elevation of the car, and the asking price in a red-bordered box.*
+
+![Sticker detail](docs/screenshots/sticker-detail.jpg)
+![Sold out stamp](docs/screenshots/sold-out.jpg)
+
+*Left: full window sticker detail — spec table in dotted hairline grid, EPA fuel panel, Form MR-1 footer. Right: the single bold moment — out-of-stock lots are literally rubber-stamped "SOLD OUT" in signal red across the price corner.*
 
 ---
 
@@ -20,7 +25,7 @@ with a visible **Red → Green → Refactor** commit history.
 | Database    | **SQLite** (default) / Postgres via `DATABASE_URL` | Fits the spec; swap env var for Postgres   |
 | Auth        | **JWT** (`python-jose`) + `pbkdf2_sha256`  | No native bcrypt deps — ships on Vercel serverless   |
 | Frontend    | **React 18 (JSX) + Vite + Tailwind**        | Per spec: HTML5 + CSS3 + Tailwind + React, no TS    |
-| Fonts       | **Fraunces** (display) + **JetBrains Mono** (data) | Two families, no Inter / Roboto / system defaults |
+| Fonts       | **Barlow Condensed** (DIN-style display) + **Barlow** (body) + **JetBrains Mono** (data) | One family + a mono, no Inter / Roboto / system defaults |
 | Tests       | **pytest** + **httpx TestClient**           | Fast, isolated per-test SQLite                       |
 | Deployment  | **Vercel** (static frontend + Python API)   | Single-repo, zero-config                             |
 
@@ -41,14 +46,9 @@ with a visible **Red → Green → Refactor** commit history.
 - Restock (positive integer only — server rejects 0/negatives).
 - Delete vehicle (admin-only, 403 for buyers).
 
-| | |
-|---|---|
-| ![Login](docs/screenshots/login.jpg) | ![Register](docs/screenshots/register.jpg) |
-| *Login — document-like deposit slip with corner cut-marks.* | *Register — role picker as two document-stamped tiles, not a checkbox.* |
+![Account form](docs/screenshots/register.jpg)
 
-![Manifest with sold-out stamp](docs/screenshots/manifest-stamp.jpg)
-
-*Scroll of the manifest showing lots №002 BMW M3 E30 (sold-out, rubber-stamped) and №003 Toyota Land Cruiser.*
+*Account creation presented as **Form MR-2** — the left half is a workshop-manual intro page (Form plate, spec-sheet table of floor hours / registrar / titles, patent-drawing reference figure), and the right half is the actual intake form with role selection as two document-stamped tiles.*
 
 ---
 
@@ -210,24 +210,27 @@ car_dealership_inventory_system/
 
 ---
 
-## Design direction
+## Design direction — the "Window Sticker"
 
-Explicit anti-SaaS. The brief was *"a car dealership inventory system"* — so I
-leaned into dealer vernacular (window-stickers, bills of sale, lot numbers,
-odometers, VIN plates) rather than the default "dark dashboard with a
-glowing orange CTA." After installing the `frontend-design` skill and
-reading its catalog of AI-generated tells (dark + vermilion accent,
-single-word color accents in headlines, ALL-CAPS tracked eyebrows,
-identical rounded cards in a 3-column grid), the first UI iteration was
-scrapped and rebuilt as a bone-cream *manifest* document.
+Explicit anti-SaaS. The subject matter is a dealer floor; the design language
+is **the physical paperwork of a dealer floor** — Monroney window stickers,
+Haynes workshop manuals, Porsche press-kit spec tables, patent drawings.
+The brief was pivoted twice before landing here:
 
-| Decision                | Why                                               |
-| ----------------------- | ------------------------------------------------- |
-| **Bone paper, not dark** | Dealer floor documents are physical, warm, printed. Not an app. |
-| **Fraunces + JetBrains Mono** | Variable serif for display drama + monospace for all data (prices, VINs, mileage). Two families, no Inter. |
-| **No cards, hairline rules** | The manifest is a long typographic ledger. Each lot gets a 12-col row divided by hairlines, not a card. |
-| **One accent (rust #B33F1A)** | Used ~3 places total on screen (focus ring, selection, SOLD OUT stamp). |
-| **Rubber-stamped SOLD OUT** | The one bold moment — rotated italic serif in a thick rust border; animates on mount. |
+1. v1: dark dashboard + orange accent (scrapped — hits every AI-generated tell).
+2. v2: bone-paper *manifest* with Fraunces italics (scrapped — too editorial, not technical enough for an inventory system).
+3. **v3 (current): the Monroney window sticker.** Each vehicle is a credible printed placard — lot plates, VIN stamp, EPA fuel-economy yellow block, patent-drawing elevation, dense spec table. The data IS the design.
+
+| Decision                      | Why                                                           |
+| ----------------------------- | ------------------------------------------------------------- |
+| **Bone paper #EFECE3**        | Dealer stickers are printed on off-white stock, not dark glass. |
+| **Barlow Condensed + Barlow + JetBrains Mono** | DIN-style grotesque for display headlines (BMW-press-kit vibe), humanist sans for body, mono for every number. One family + a mono. No Inter, no system defaults. |
+| **No cards. Window stickers.** | Each listing is a bordered 2-column placard with a hard offset shadow (3px, no blur) — printed-document look. |
+| **Two accents, each used once per sticker** | Signal red #D21919 bordering the price; EPA yellow #F3D421 as the fuel-economy block. No other color anywhere. |
+| **Rubber-stamped SOLD OUT**   | Rotated red bar across the price corner; animates on mount. The one bold moment. |
+| **Patent-drawing CarDiagram** | Hairline-stroked side elevation of a generic car, with "FIG. 1 — SIDE ELEVATION" and a REF. A dimension line. Workshop-manual code. |
+| **Dotted-hairline spec table** | Haynes-manual grid: dim label on the left, right-aligned mono value on the right, dotted rule between. |
+| **Deterministic faux-specs**   | Each listing shows invented but stable VIN, mileage, MPG, engine, trans, drive, color, seating — derived from `id` so they stay consistent per vehicle. The backend doesn't store these; the UI makes the paper document complete. |
 
 ## My AI Usage
 
