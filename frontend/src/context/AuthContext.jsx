@@ -1,19 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
 
-type JwtPayload = { sub: string; is_admin: boolean; exp: number };
+const AuthContext = createContext(null);
 
-type AuthContextType = {
-  token: string | null;
-  email: string | null;
-  isAdmin: boolean;
-  login: (token: string) => void;
-  logout: () => void;
-};
-
-const AuthContext = createContext<AuthContextType | null>(null);
-
-function decode(token: string): JwtPayload | null {
+function decode(token) {
   try {
     const payload = token.split('.')[1];
     return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
@@ -22,21 +11,21 @@ function decode(token: string): JwtPayload | null {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
 
   useEffect(() => {
     if (token) localStorage.setItem('token', token);
     else localStorage.removeItem('token');
   }, [token]);
 
-  const value = useMemo<AuthContextType>(() => {
+  const value = useMemo(() => {
     const payload = token ? decode(token) : null;
     return {
       token,
       email: payload?.sub ?? null,
       isAdmin: !!payload?.is_admin,
-      login: (t: string) => setToken(t),
+      login: (t) => setToken(t),
       logout: () => setToken(null),
     };
   }, [token]);

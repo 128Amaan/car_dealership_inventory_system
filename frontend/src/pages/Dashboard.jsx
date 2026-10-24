@@ -1,24 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api';
-import type { Vehicle } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { VehicleCard } from '../components/VehicleCard';
 import { Modal } from '../components/Modal';
 import { VehicleForm } from '../components/VehicleForm';
 
-type SearchState = { make: string; model: string; category: string; min: string; max: string };
-const EMPTY_SEARCH: SearchState = { make: '', model: '', category: '', min: '', max: '' };
+const EMPTY_SEARCH = { make: '', model: '', category: '', min: '', max: '' };
 
 export default function Dashboard() {
   const { isAdmin } = useAuth();
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
-  const [filters, setFilters] = useState<SearchState>(EMPTY_SEARCH);
-  const [busyId, setBusyId] = useState<number | null>(null);
-  const [editing, setEditing] = useState<Vehicle | null>(null);
+  const [err, setErr] = useState(null);
+  const [filters, setFilters] = useState(EMPTY_SEARCH);
+  const [busyId, setBusyId] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [creating, setCreating] = useState(false);
-  const [restocking, setRestocking] = useState<Vehicle | null>(null);
+  const [restocking, setRestocking] = useState(null);
   const [restockAmt, setRestockAmt] = useState(1);
 
   const load = useCallback(async () => {
@@ -26,7 +24,7 @@ export default function Dashboard() {
     try {
       const hasFilter = Object.values(filters).some(Boolean);
       const url = hasFilter ? '/vehicles/search' : '/vehicles';
-      const params: Record<string, string> = {};
+      const params = {};
       if (hasFilter) {
         if (filters.make) params.make = filters.make;
         if (filters.model) params.model = filters.model;
@@ -34,41 +32,41 @@ export default function Dashboard() {
         if (filters.min) params.min_price = filters.min;
         if (filters.max) params.max_price = filters.max;
       }
-      const { data } = await api.get<Vehicle[]>(url, { params });
+      const { data } = await api.get(url, { params });
       setVehicles(data);
-    } catch (e: any) {
+    } catch (e) {
       setErr(e?.response?.data?.detail ?? 'Failed to load vehicles');
     } finally { setLoading(false); }
   }, [filters]);
 
   useEffect(() => { load(); }, [load]);
 
-  async function purchase(id: number) {
+  async function purchase(id) {
     setBusyId(id);
     try {
-      const { data } = await api.post<Vehicle>(`/vehicles/${id}/purchase`);
+      const { data } = await api.post(`/vehicles/${id}/purchase`);
       setVehicles(xs => xs.map(v => v.id === id ? data : v));
-    } catch (e: any) { alert(e?.response?.data?.detail ?? 'Purchase failed'); }
+    } catch (e) { alert(e?.response?.data?.detail ?? 'Purchase failed'); }
     finally { setBusyId(null); }
   }
 
-  async function remove(id: number) {
+  async function remove(id) {
     if (!confirm('Delete this vehicle?')) return;
     setBusyId(id);
     try { await api.delete(`/vehicles/${id}`); setVehicles(xs => xs.filter(v => v.id !== id)); }
-    catch (e: any) { alert(e?.response?.data?.detail ?? 'Delete failed'); }
+    catch (e) { alert(e?.response?.data?.detail ?? 'Delete failed'); }
     finally { setBusyId(null); }
   }
 
-  async function createVehicle(form: Omit<Vehicle, 'id'>) {
-    const { data } = await api.post<Vehicle>('/vehicles', form);
+  async function createVehicle(form) {
+    const { data } = await api.post('/vehicles', form);
     setVehicles(xs => [data, ...xs]);
     setCreating(false);
   }
 
-  async function updateVehicle(form: Omit<Vehicle, 'id'>) {
+  async function updateVehicle(form) {
     if (!editing) return;
-    const { data } = await api.put<Vehicle>(`/vehicles/${editing.id}`, form);
+    const { data } = await api.put(`/vehicles/${editing.id}`, form);
     setVehicles(xs => xs.map(v => v.id === editing.id ? data : v));
     setEditing(null);
   }
@@ -76,10 +74,10 @@ export default function Dashboard() {
   async function doRestock() {
     if (!restocking) return;
     try {
-      const { data } = await api.post<Vehicle>(`/vehicles/${restocking.id}/restock`, { amount: restockAmt });
+      const { data } = await api.post(`/vehicles/${restocking.id}/restock`, { amount: restockAmt });
       setVehicles(xs => xs.map(v => v.id === restocking.id ? data : v));
       setRestocking(null); setRestockAmt(1);
-    } catch (e: any) { alert(e?.response?.data?.detail ?? 'Restock failed'); }
+    } catch (e) { alert(e?.response?.data?.detail ?? 'Restock failed'); }
   }
 
   const stats = useMemo(() => ({
@@ -90,7 +88,6 @@ export default function Dashboard() {
 
   return (
     <div className="relative isolate">
-      {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 grid-bg opacity-25" />
         <div className="absolute -right-24 top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-accent/25 blur-3xl animate-float" />
@@ -113,7 +110,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* search bar */}
           <div className="card mt-10 p-4 md:p-5">
             <div className="grid gap-3 md:grid-cols-6">
               <input className="input md:col-span-1" placeholder="Make"     value={filters.make}     onChange={e => setFilters(f => ({...f, make: e.target.value}))} />
@@ -130,7 +126,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Grid */}
       <section className="mx-auto max-w-7xl px-6 py-10">
         {err && <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">{err}</div>}
         {loading ? (
@@ -166,7 +161,7 @@ export default function Dashboard() {
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Edit vehicle">
         <VehicleForm initial={editing ?? undefined} onSubmit={updateVehicle} onCancel={() => setEditing(null)} submitLabel="Save changes" />
       </Modal>
-      <Modal open={!!restocking} onClose={() => setRestocking(null)} title={`Restock ${restocking?.make} ${restocking?.model}`}>
+      <Modal open={!!restocking} onClose={() => setRestocking(null)} title={`Restock ${restocking?.make ?? ''} ${restocking?.model ?? ''}`}>
         <div className="grid gap-4">
           <div>
             <label className="label">Add units</label>
@@ -182,7 +177,7 @@ export default function Dashboard() {
   );
 }
 
-function StatTile({ label, value }: { label: string; value: string | number }) {
+function StatTile({ label, value }) {
   return (
     <div className="card px-4 py-3">
       <div className="text-[10px] uppercase tracking-widest text-chrome/50">{label}</div>

@@ -6,19 +6,19 @@ import { useAuth } from '../context/AuthContext';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
   const { login } = useAuth();
   const nav = useNavigate();
-  const loc = useLocation() as any;
+  const loc = useLocation();
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e) {
     e.preventDefault(); setErr(null); setBusy(true);
     try {
       const { data } = await api.post('/auth/login', { email, password });
       login(data.access_token);
       nav(loc.state?.from ?? '/', { replace: true });
-    } catch (e: any) {
+    } catch (e) {
       setErr(e?.response?.data?.detail ?? 'Login failed');
     } finally { setBusy(false); }
   }
@@ -38,7 +38,7 @@ export default function Login() {
   );
 }
 
-export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+export function AuthShell({ title, subtitle, children }) {
   return (
     <div className="relative isolate flex min-h-[calc(100vh-80px)] items-center justify-center overflow-hidden px-6 py-12">
       <div className="absolute inset-0 grid-bg opacity-30" />

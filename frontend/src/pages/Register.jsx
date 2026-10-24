@@ -8,19 +8,19 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
   const { login } = useAuth();
   const nav = useNavigate();
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e) {
     e.preventDefault(); setErr(null); setBusy(true);
     try {
       await api.post('/auth/register', { email, password, is_admin: isAdmin });
       const { data } = await api.post('/auth/login', { email, password });
       login(data.access_token);
       nav('/', { replace: true });
-    } catch (e: any) {
+    } catch (e) {
       setErr(e?.response?.data?.detail ?? 'Registration failed');
     } finally { setBusy(false); }
   }

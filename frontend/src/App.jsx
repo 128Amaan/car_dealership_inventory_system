@@ -5,7 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
-function Protected({ children }: { children: JSX.Element }) {
+function Protected({ children }) {
   const { token } = useAuth();
   const loc = useLocation();
   if (!token) return <Navigate to="/login" state={{ from: loc.pathname }} replace />;

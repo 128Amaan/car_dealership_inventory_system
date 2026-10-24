@@ -1,29 +1,11 @@
-import type { Vehicle } from '../api';
-
 const palette = ['from-orange-500/20', 'from-sky-500/20', 'from-emerald-500/20', 'from-violet-500/20', 'from-pink-500/20'];
 
-export function VehicleCard({
-  vehicle,
-  onPurchase,
-  onEdit,
-  onDelete,
-  onRestock,
-  isAdmin,
-  busy,
-}: {
-  vehicle: Vehicle;
-  onPurchase: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  onRestock?: () => void;
-  isAdmin: boolean;
-  busy?: boolean;
-}) {
+export function VehicleCard({ vehicle, onPurchase, onEdit, onDelete, onRestock, isAdmin, busy }) {
   const tint = palette[vehicle.id % palette.length];
   const outOfStock = vehicle.quantity <= 0;
 
   return (
-    <div className={`card group relative overflow-hidden`}>
+    <div className="card group relative overflow-hidden">
       <div className={`absolute inset-x-0 -top-20 h-40 bg-gradient-to-b ${tint} to-transparent blur-2xl opacity-70 group-hover:opacity-100 transition`} />
       <div className="relative p-5">
         <div className="flex items-start justify-between gap-3">

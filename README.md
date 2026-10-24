@@ -17,7 +17,7 @@ with a visible **Red → Green → Refactor** commit history.
 | Backend     | **FastAPI** 0.115 + SQLAlchemy 2.x         | Async-ready, zero-ceremony JWT, trivial pytest story |
 | Database    | **SQLite** (default) / Postgres via `DATABASE_URL` | Fits the spec; swap env var for Postgres   |
 | Auth        | **JWT** (`python-jose`) + `pbkdf2_sha256`  | No native bcrypt deps — ships on Vercel serverless   |
-| Frontend    | **React 18 + TypeScript + Vite + Tailwind** | Per spec; Vite = fast HMR, prod bundle < 80 kB gzip |
+| Frontend    | **React 18 (JSX) + Vite + Tailwind**        | Per spec: HTML5 + CSS3 + Tailwind + React, no TS    |
 | Tests       | **pytest** + **httpx TestClient**           | Fast, isolated per-test SQLite                       |
 | Deployment  | **Vercel** (static frontend + Python API)   | Single-repo, zero-config                             |
 

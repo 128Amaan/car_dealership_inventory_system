@@ -5,7 +5,7 @@ export function Navbar() {
   const { email, isAdmin, token, logout } = useAuth();
   const nav = useNavigate();
 
-  const linkCls = ({ isActive }: { isActive: boolean }) =>
+  const linkCls = ({ isActive }) =>
     `px-3 py-1.5 rounded-lg text-sm font-medium transition ${
       isActive ? 'text-accent' : 'text-chrome/70 hover:text-chrome'
     }`;

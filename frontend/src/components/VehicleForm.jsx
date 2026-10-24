@@ -1,27 +1,14 @@
 import { useEffect, useState } from 'react';
-import type { Vehicle } from '../api';
 
-export type VehicleFormValues = Omit<Vehicle, 'id'>;
-
-const EMPTY: VehicleFormValues = {
+const EMPTY = {
   make: '', model: '', category: 'sedan',
   price: 20000, quantity: 1, year: new Date().getFullYear(), image_url: null,
 };
 
-export function VehicleForm({
-  initial,
-  onSubmit,
-  onCancel,
-  submitLabel = 'Save',
-}: {
-  initial?: Vehicle;
-  onSubmit: (v: VehicleFormValues) => Promise<void>;
-  onCancel: () => void;
-  submitLabel?: string;
-}) {
-  const [v, setV] = useState<VehicleFormValues>(EMPTY);
+export function VehicleForm({ initial, onSubmit, onCancel, submitLabel = 'Save' }) {
+  const [v, setV] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [err, setErr] = useState(null);
 
   useEffect(() => {
     if (initial) {
@@ -32,15 +19,15 @@ export function VehicleForm({
     }
   }, [initial]);
 
-  const upd = (k: keyof VehicleFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const upd = (k) => (e) => {
     const val = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
     setV((prev) => ({ ...prev, [k]: val }));
   };
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e) {
     e.preventDefault();
     setBusy(true); setErr(null);
-    try { await onSubmit(v); } catch (e: any) {
+    try { await onSubmit(v); } catch (e) {
       setErr(e?.response?.data?.detail ?? 'Something went wrong');
     } finally { setBusy(false); }
   }
@@ -51,7 +38,7 @@ export function VehicleForm({
       <div><label className="label">Model</label>   <input className="input" required value={v.model} onChange={upd('model')} /></div>
       <div>
         <label className="label">Category</label>
-        <select className="input" value={v.category} onChange={upd('category') as any}>
+        <select className="input" value={v.category} onChange={upd('category')}>
           {['sedan','suv','truck','coupe','hatchback','ev','convertible'].map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
