@@ -1,0 +1,40 @@
+          
+    @app.on_event("startup")
+
+.venv/lib/python3.11/site-packages/fastapi/applications.py:4495
+  /Users/sarvesh/Downloads/amaan-proj/car_dealership_inventory_system/backend/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+--------- coverage: platform darwin, python 3.11.17-final-0 ----------
+Name                       Stmts   Miss  Cover
+----------------------------------------------
+app/__init__.py                0      0   100%
+app/core/__init__.py           0      0   100%
+app/core/config.py            10      0   100%
+app/core/database.py          12      4    67%
+app/core/deps.py              22      3    86%
+app/core/security.py          18      2    89%
+app/main.py                   15      1    93%
+app/models/__init__.py         2      0   100%
+app/models/user.py             9      0   100%
+app/models/vehicle.py         13      0   100%
+app/routers/__init__.py        0      0   100%
+app/routers/auth.py           23      0   100%
+app/routers/vehicles.py       44      0   100%
+app/schemas/__init__.py        0      0   100%
+app/schemas/auth.py           17      0   100%
+app/schemas/inventory.py       3      0   100%
+app/schemas/vehicle.py        24      0   100%
+app/services/__init__.py       0      0   100%
+app/services/vehicles.py      36      0   100%
+----------------------------------------------
+TOTAL                        248     10    96%
+
+23 passed, 7 warnings in 0.93s

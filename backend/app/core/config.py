@@ -1,8 +1,11 @@
 from pydantic_settings import BaseSettings
 
 
+import os
+
+
 class Settings(BaseSettings):
-    database_url: str = "sqlite:///./dealership.db"
+    database_url: str = os.environ.get("DATABASE_URL", "sqlite:///./dealership.db")
     jwt_secret: str = "change-me-in-production-please-use-env-var"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
