@@ -3,10 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine
 from app.routers import auth as auth_router
+from app.routers import vehicles as vehicles_router
 
 app = FastAPI(title="Car Dealership Inventory API", version="1.0.0")
 
 app.include_router(auth_router.router)
+app.include_router(vehicles_router.router)
 
 app.add_middleware(
     CORSMiddleware,
